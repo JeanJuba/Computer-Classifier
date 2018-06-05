@@ -153,8 +153,8 @@ public class GraphicInterface extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
         comboPlaca = new javax.swing.JComboBox<String>();
-        botaoReconhecer = new javax.swing.JToggleButton();
         botaoConfigurar = new javax.swing.JButton();
+        botaoReconhecer = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaOutput = new javax.swing.JTextArea();
 
@@ -231,9 +231,9 @@ public class GraphicInterface extends javax.swing.JFrame {
                 .addContainerGap(31, Short.MAX_VALUE))
         );
 
-        botaoReconhecer.setText("Reconhecer");
-
         botaoConfigurar.setText("Configurar");
+
+        botaoReconhecer.setText("Reconhecer");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -248,8 +248,8 @@ public class GraphicInterface extends javax.swing.JFrame {
                     .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel3)
                     .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(botaoConfigurar)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(botaoConfigurar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(botaoReconhecer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(21, Short.MAX_VALUE))
@@ -352,7 +352,7 @@ public class GraphicInterface extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton botaoConfigurar;
-    private javax.swing.JToggleButton botaoReconhecer;
+    private javax.swing.JButton botaoReconhecer;
     private javax.swing.ButtonGroup btGroupProcessador;
     private javax.swing.ButtonGroup btGroupRam;
     private javax.swing.JComboBox<String> comboPlaca;
