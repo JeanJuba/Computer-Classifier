@@ -1,20 +1,24 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
+ * To change this license header, choose License Headers in Project Props.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 package gui;
 
+import java.util.Arrays;
 import javax.swing.JOptionPane;
-import util.Rna;
+import util.Props;
+import main.Rna;
 
 /**
  *
  * @author m95952
  */
 public class GraphicInterface extends javax.swing.JFrame {
+
     private final String STANDARD_SELECT = "Selecionar";
     private Rna redeNeural;
+
     /**
      * Creates new form GraphicInterface
      */
@@ -24,66 +28,107 @@ public class GraphicInterface extends javax.swing.JFrame {
         addListeners();
     }
 
-    
-    private void config(){
+    private void config() {
         this.setLocationRelativeTo(null);
     }
-    
-    
-    private void addListeners(){
+
+    private void addListeners() {
         botaoReconhecer.addActionListener((e) -> {
-            try{
+            try {
                 validateInput();
+                double[] entrada = getEntradaReconhecimento();
+                textAreaOutput.append(Arrays.toString(entrada) + "\n"); //Usado para testar qual a  entrada escolhida quando traduzida para binário
+                iniciarBackPropagation(entrada);
                 
-            }catch(Exception ex){
+            } catch (Exception ex) {
                 showDialog(ex.getMessage());
             }
-            
         });
+        
+        
+        botaoConfigurar.addActionListener((e) -> {
+            new ConfigDialog(this, true).showDialog();
+        });
+        
     }
-    
+
     /**
      * Lê os dados e valida caso estiverem selecionados corretamente
-     * @throws Exception 
+     *
+     * @throws Exception
      */
-    private void  validateInput() throws  Exception{
+    private void validateInput() throws Exception {
         String selectedProcessor = (String) comboProcessador.getSelectedItem();
         String selectedRam = (String) comboRam.getSelectedItem();
         String selectedPlaca = (String) comboPlaca.getSelectedItem();
-        
-        if(selectedProcessor.equals(STANDARD_SELECT)){
+
+        if (selectedProcessor.equals(STANDARD_SELECT)) {
             throw new Exception("Processador inválido!");
         }
-        
-        if(selectedRam.equals(STANDARD_SELECT)){
+
+        if (selectedRam.equals(STANDARD_SELECT)) {
             throw new Exception("RAM inválida!");
         }
-        
-        if(selectedPlaca.equals(STANDARD_SELECT)){
+
+        if (selectedPlaca.equals(STANDARD_SELECT)) {
             throw new Exception("Placa inválida!");
         }
     }
-    
-    private double[] getEntradaReconhecimento(){
+
+    /**
+     * Retorna um array de bits representando as configurações selecionadas
+     * @return 
+     */
+    private double[] getEntradaReconhecimento() {
+        double[] entrada = new double[Props.TAMANHO_ENTRADA];
         
-        return null;
-    }
-    
-    private void iniciarBackPropagation(){
-        redeNeural =  new Rna();
-        redeNeural.configure();
-        redeNeural.treinar();
-        redeNeural.reconhecer(entrada)
+        for(int i = 0; i < Props.TAMANHO_ENTRADA; i++){
+            entrada[i] = 0;
+        }
         
+        int processor = comboProcessador.getSelectedIndex() - 1;
+        int ram = comboRam.getSelectedIndex() + Props.NUMERO_PROCESSADORES  - 1;
+        int placa = comboPlaca.getSelectedIndex() + Props.NUMERO_PROCESSADORES + Props.NUMERO_RAM - 1 ;
+        
+        entrada[processor] = 1;
+        entrada[ram] = 1;
+        entrada[placa] = 1;
+        
+        return entrada;
     }
-    
-    
+
+    /**
+     * Chama os métodos necessários para utilizar o API Adrena
+     */
+    private void iniciarBackPropagation(double[] entrada) {
+        try {
+            redeNeural = new Rna();
+            redeNeural.configure();
+            redeNeural.treinar();
+            double[] response = redeNeural.reconhecer(entrada);
+            
+            if(response[0] > 0.5){
+                textAreaOutput.append("Computador Gamer\n\n");
+            }else{
+                textAreaOutput.append("Computador Comum\n\n");
+            }
+            //textAreaOutput.append("1 - Computador comum, 2 - Computador Gamer : " + Arrays.toString(response) + "\n\n");
+        } catch (Exception ex) {
+            showDialog(ex.getMessage());
+        }
+    }
+
     /**
      * Mostra a mensagem passada através de um diálogo modal.
-     * @param message 
+     *
+     * @param message
      */
-    private void showDialog(String message){
+    private void showDialog(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    private void limpaCampos(){
+        textAreaOutput.setText("");
     }
     
     /**
@@ -101,15 +146,15 @@ public class GraphicInterface extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jPanel3 = new javax.swing.JPanel();
-        comboProcessador = new javax.swing.JComboBox<>();
+        comboProcessador = new javax.swing.JComboBox<String>();
         jLabel2 = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
-        comboRam = new javax.swing.JComboBox<>();
+        comboRam = new javax.swing.JComboBox<String>();
         jLabel3 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
-        comboPlaca = new javax.swing.JComboBox<>();
+        comboPlaca = new javax.swing.JComboBox<String>();
         botaoReconhecer = new javax.swing.JToggleButton();
-        botaoTreinar = new javax.swing.JToggleButton();
+        botaoConfigurar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaOutput = new javax.swing.JTextArea();
 
@@ -121,7 +166,7 @@ public class GraphicInterface extends javax.swing.JFrame {
 
         jPanel3.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        comboProcessador.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecionar", "Intel i3", "Intel i5", "Intel i7", "AMD Ryzen 3", "AMD Ryzen 5", "AMD Ryzen 7" }));
+        comboProcessador.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecionar", "Intel i3", "Intel i5", "Intel i7", "AMD Ryzen 3", "AMD Ryzen 5", "AMD Ryzen 7" }));
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -144,7 +189,7 @@ public class GraphicInterface extends javax.swing.JFrame {
 
         jPanel4.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        comboRam.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecionar", "4GB", "6GB", "8GB", "16GB", "32GB" }));
+        comboRam.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecionar", "4GB", "6GB", "8GB", "16GB", "32GB" }));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -167,7 +212,7 @@ public class GraphicInterface extends javax.swing.JFrame {
 
         jPanel5.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        comboPlaca.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecionar", "0GB", "2GB", "3GB", "6GB", "8GB", "11GB", "16GB" }));
+        comboPlaca.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Selecionar", "0GB", "2GB", "3GB", "6GB", "8GB", "11GB", "16GB" }));
 
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
@@ -188,7 +233,7 @@ public class GraphicInterface extends javax.swing.JFrame {
 
         botaoReconhecer.setText("Reconhecer");
 
-        botaoTreinar.setText("Treinar");
+        botaoConfigurar.setText("Configurar");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -196,17 +241,16 @@ public class GraphicInterface extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel1)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel3)
-                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel1)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel2)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel3)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(botaoTreinar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(botaoConfigurar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(botaoReconhecer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
@@ -227,13 +271,15 @@ public class GraphicInterface extends javax.swing.JFrame {
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(botaoReconhecer)
-                    .addComponent(botaoTreinar))
+                    .addComponent(botaoConfigurar)
+                    .addComponent(botaoReconhecer))
                 .addContainerGap(154, Short.MAX_VALUE))
         );
 
         textAreaOutput.setColumns(20);
+        textAreaOutput.setLineWrap(true);
         textAreaOutput.setRows(5);
+        textAreaOutput.setWrapStyleWord(true);
         jScrollPane1.setViewportView(textAreaOutput);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -243,7 +289,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 388, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -305,8 +351,8 @@ public class GraphicInterface extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botaoConfigurar;
     private javax.swing.JToggleButton botaoReconhecer;
-    private javax.swing.JToggleButton botaoTreinar;
     private javax.swing.ButtonGroup btGroupProcessador;
     private javax.swing.ButtonGroup btGroupRam;
     private javax.swing.JComboBox<String> comboPlaca;
