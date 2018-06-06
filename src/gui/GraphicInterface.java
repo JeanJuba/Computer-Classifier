@@ -9,10 +9,10 @@ import ADReNA_API.Data.DataSet;
 import java.io.File;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
-import main.FileParser;
 import util.Props;
 import main.Rna;
 import util.FileChooser;
+import util.FileParser;
 
 /**
  *
@@ -59,6 +59,7 @@ public class GraphicInterface extends javax.swing.JFrame {
         
         botaoConfigurar.addActionListener((e) -> {
             new ConfigDialog(this, true).showDialog();
+            redeNeural.configure();
         });
         
         botaoBuscar.addActionListener((e) -> {
