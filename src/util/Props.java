@@ -11,13 +11,13 @@ package util;
  */
 public class Props {
     public static  int CAMADAS_INTERMEDIARIAS = 1;
-    public static  int[] NUMERO_NEURONIOS = {6}; //Número de neurônios em cada camada
+    public static  int[] NUMERO_NEURONIOS = {6}; //Número de neurônios em cada camada intermediária (Deve ser do mesmo comprimento do número de camadas intermediárias)
     public static  double TAXA_APRENDIZADO = 0.3;
     public static  double FATOR_MOMENTANEO = 0.005; //Taxa erro
     public static  int NUMERO_ITERACOES = 10000;    
     
-    public static final int TAMANHO_ENTRADA = 18; 
-    public static final int TAMANHO_SAIDA   = 1; //Normal/Gamer
+    public static final int TAMANHO_ENTRADA = 18; //Neurônios de entrada
+    public static final int TAMANHO_SAIDA   = 1; //Neurônios de saída
     
     //Necessários para pegar o index correto da seleção no array binário
     public static final int NUMERO_PROCESSADORES = 6;

@@ -48,6 +48,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             try {
                 validateInput();
                 double[] entrada = getEntradaReconhecimento();
+                textAreaOutput.append("Processador " + (String)comboProcessador.getSelectedItem() + ", " + (String)comboRam.getSelectedItem() + " RAM, " + (String)comboPlaca.getSelectedItem() + " vídeo\n");
                 textAreaOutput.append(Arrays.toString(entrada) + " = "); //Usado para testar qual a  entrada escolhida quando traduzida para binário
                 iniciarBackPropagation(entrada);
                 
