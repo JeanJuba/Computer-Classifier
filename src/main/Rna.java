@@ -35,10 +35,11 @@ public class Rna {
     
     /**
      * Os dados de inserção e qual saída é esperada
+     * @param tSet
      * @throws Exception 
      */
-    public void treinar() throws Exception{
-        trainingSet = new DataSet(Props.TAMANHO_ENTRADA, Props.TAMANHO_SAIDA);
+    public void treinar(DataSet tSet) throws Exception{
+        /*trainingSet = new DataSet(Props.TAMANHO_ENTRADA, Props.TAMANHO_SAIDA);
                                                        //Intel******  AMD**********  Ram********************  Placa---------------------------
         trainingSet.Add(new DataSetObject(new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0}, new double[]{0}));
         trainingSet.Add(new DataSetObject(new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}, new double[]{0}));
@@ -46,8 +47,8 @@ public class Rna {
         trainingSet.Add(new DataSetObject(new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0}, new double[]{1}));
         trainingSet.Add(new DataSetObject(new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0}, new double[]{1}));
         trainingSet.Add(new DataSetObject(new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0}, new double[]{1}));
-        
-        neuralNetwork.Learn(trainingSet);
+        */
+        neuralNetwork.Learn(tSet);
     }
     
     public double[] reconhecer(double[] entrada) throws Exception{

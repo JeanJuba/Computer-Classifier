@@ -5,10 +5,14 @@
  */
 package gui;
 
+import ADReNA_API.Data.DataSet;
+import java.io.File;
 import java.util.Arrays;
 import javax.swing.JOptionPane;
+import main.FileParser;
 import util.Props;
 import main.Rna;
+import util.FileChooser;
 
 /**
  *
@@ -18,7 +22,10 @@ public class GraphicInterface extends javax.swing.JFrame {
 
     private final String STANDARD_SELECT = "Selecionar";
     private Rna redeNeural;
-
+    private File trainingFile = null;
+    
+    private final FileChooser fileChooser;
+    
     /**
      * Creates new form GraphicInterface
      */
@@ -26,6 +33,10 @@ public class GraphicInterface extends javax.swing.JFrame {
         initComponents();
         config();
         addListeners();
+        
+        redeNeural = new Rna();
+        redeNeural.configure();
+        fileChooser = new FileChooser();
     }
 
     private void config() {
@@ -37,7 +48,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             try {
                 validateInput();
                 double[] entrada = getEntradaReconhecimento();
-                textAreaOutput.append(Arrays.toString(entrada) + "\n"); //Usado para testar qual a  entrada escolhida quando traduzida para binário
+                textAreaOutput.append(Arrays.toString(entrada) + " = "); //Usado para testar qual a  entrada escolhida quando traduzida para binário
                 iniciarBackPropagation(entrada);
                 
             } catch (Exception ex) {
@@ -50,8 +61,41 @@ public class GraphicInterface extends javax.swing.JFrame {
             new ConfigDialog(this, true).showDialog();
         });
         
+        botaoBuscar.addActionListener((e) -> {
+            getTrainingFile();
+        });
+        
+        botaoTreinar.addActionListener((e) -> {
+            try {
+                treinar();
+            } catch (Exception ex) {
+                showDialog(ex.getMessage());
+            }
+        });
+        
     }
 
+    private void getTrainingFile(){
+        trainingFile = fileChooser.findFile();
+    
+        if(trainingFile != null){
+            campoArquivoTreinamento.setText(trainingFile.getName());
+        }else{
+            campoArquivoTreinamento.setText("");
+        }
+    }
+    
+    private void treinar() throws Exception{
+        
+        if(trainingFile == null){
+            throw new Exception("Nenhum arquivo de treinamento escolhido!");
+        }
+        
+        DataSet tSet = FileParser.readFile(trainingFile);
+        System.out.println("Input size: " + tSet.GetList().size());
+        redeNeural.treinar(tSet);
+    }
+    
     /**
      * Lê os dados e valida caso estiverem selecionados corretamente
      *
@@ -102,10 +146,11 @@ public class GraphicInterface extends javax.swing.JFrame {
      */
     private void iniciarBackPropagation(double[] entrada) {
         try {
-            redeNeural = new Rna();
-            redeNeural.configure();
-            redeNeural.treinar();
+            //redeNeural.configure();
+            
             double[] response = redeNeural.reconhecer(entrada);
+            
+            textAreaOutput.append(String.valueOf(response[0]) + "\n");
             
             if(response[0] > 0.5){
                 textAreaOutput.append("Computador Gamer\n\n");
@@ -155,6 +200,10 @@ public class GraphicInterface extends javax.swing.JFrame {
         comboPlaca = new javax.swing.JComboBox<String>();
         botaoConfigurar = new javax.swing.JButton();
         botaoReconhecer = new javax.swing.JButton();
+        campoArquivoTreinamento = new javax.swing.JTextField();
+        botaoBuscar = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        botaoTreinar = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         textAreaOutput = new javax.swing.JTextArea();
 
@@ -235,23 +284,39 @@ public class GraphicInterface extends javax.swing.JFrame {
 
         botaoReconhecer.setText("Reconhecer");
 
+        campoArquivoTreinamento.setEditable(false);
+
+        botaoBuscar.setText("Buscar");
+
+        jLabel4.setText("Arquivo de Treinamento");
+
+        botaoTreinar.setText("Treinar");
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel1)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel2)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(botaoConfigurar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(botaoReconhecer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addComponent(botaoTreinar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(campoArquivoTreinamento)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(botaoBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(botaoConfigurar, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(botaoReconhecer, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(21, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
@@ -273,7 +338,15 @@ public class GraphicInterface extends javax.swing.JFrame {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(botaoConfigurar)
                     .addComponent(botaoReconhecer))
-                .addContainerGap(154, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jLabel4)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(campoArquivoTreinamento, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(botaoBuscar))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(botaoTreinar)
+                .addContainerGap(64, Short.MAX_VALUE))
         );
 
         textAreaOutput.setColumns(20);
@@ -289,7 +362,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 562, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 602, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -341,6 +414,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(GraphicInterface.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -351,16 +425,20 @@ public class GraphicInterface extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton botaoBuscar;
     private javax.swing.JButton botaoConfigurar;
     private javax.swing.JButton botaoReconhecer;
+    private javax.swing.JButton botaoTreinar;
     private javax.swing.ButtonGroup btGroupProcessador;
     private javax.swing.ButtonGroup btGroupRam;
+    private javax.swing.JTextField campoArquivoTreinamento;
     private javax.swing.JComboBox<String> comboPlaca;
     private javax.swing.JComboBox<String> comboProcessador;
     private javax.swing.JComboBox<String> comboRam;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

@@ -10,6 +10,7 @@ import ADReNA_API.Data.DataSetObject;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.util.Arrays;
 import util.Props;
 
 /**
@@ -42,6 +43,7 @@ public class FileParser {
                 targetOutput[0] = 0;
             }
             
+            System.out.println(Arrays.toString(input) + " = " + Arrays.toString(targetOutput));
             trainingSet.Add(new DataSetObject(input, targetOutput));
             line = br.readLine();
         }
