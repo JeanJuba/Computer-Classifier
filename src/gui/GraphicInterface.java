@@ -23,6 +23,7 @@ public class GraphicInterface extends javax.swing.JFrame {
     private final String STANDARD_SELECT = "Selecionar";
     private Rna redeNeural;
     private File trainingFile = null;
+    private boolean trained = false;
     
     private final FileChooser fileChooser;
     
@@ -48,6 +49,7 @@ public class GraphicInterface extends javax.swing.JFrame {
             try {
                 validateInput();
                 double[] entrada = getEntradaReconhecimento();
+                
                 textAreaOutput.append("Processador " + (String)comboProcessador.getSelectedItem() + ", " + (String)comboRam.getSelectedItem() + " RAM, " + (String)comboPlaca.getSelectedItem() + " vídeo\n");
                 textAreaOutput.append(Arrays.toString(entrada) + " = "); //Usado para testar qual a  entrada escolhida quando traduzida para binário
                 iniciarBackPropagation(entrada);
@@ -61,6 +63,7 @@ public class GraphicInterface extends javax.swing.JFrame {
         botaoConfigurar.addActionListener((e) -> {
             new ConfigDialog(this, true).showDialog();
             redeNeural.configure();
+            trained = false;
         });
         
         botaoBuscar.addActionListener((e) -> {
@@ -94,8 +97,9 @@ public class GraphicInterface extends javax.swing.JFrame {
         }
         
         DataSet tSet = FileParser.readFile(trainingFile);
-        System.out.println("Input size: " + tSet.GetList().size());
+        //System.out.println("Input size: " + tSet.GetList().size());
         redeNeural.treinar(tSet);
+        trained = true;
     }
     
     /**
@@ -107,7 +111,11 @@ public class GraphicInterface extends javax.swing.JFrame {
         String selectedProcessor = (String) comboProcessador.getSelectedItem();
         String selectedRam = (String) comboRam.getSelectedItem();
         String selectedPlaca = (String) comboPlaca.getSelectedItem();
-
+        
+        if(!trained){
+            throw new Exception("É necessário treinar a RNA antes de tentar reconhecer uma entrada!");
+        }
+        
         if (selectedProcessor.equals(STANDARD_SELECT)) {
             throw new Exception("Processador inválido!");
         }
@@ -153,12 +161,13 @@ public class GraphicInterface extends javax.swing.JFrame {
             double[] response = redeNeural.reconhecer(entrada);
             
             textAreaOutput.append(String.valueOf(response[0]) + "\n");
-            
+           
             if(response[0] > 0.5){
-                textAreaOutput.append("Computador Gamer\n\n");
+                textAreaOutput.append("Computador Gamer\n");
             }else{
-                textAreaOutput.append("Computador Comum\n\n");
+                textAreaOutput.append("Computador Comum\n");
             }
+            textAreaOutput.append("Error Rate: " + redeNeural.getError() + "\nIteration Number: " + redeNeural.getIterationNumber() + "\n\n");
             //textAreaOutput.append("1 - Computador comum, 2 - Computador Gamer : " + Arrays.toString(response) + "\n\n");
         } catch (Exception ex) {
             showDialog(ex.getMessage());

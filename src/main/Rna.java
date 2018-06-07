@@ -52,7 +52,20 @@ public class Rna {
     }
     
     public double[] reconhecer(double[] entrada) throws Exception{
+        //System.out.println("Error rate: " + neuralNetwork.GetErrorRate());
+        //System.out.println("Error: " + neuralNetwork.Error);
+        //System.out.println("Iteration Number: " + neuralNetwork.iterationNumber);
+        //System.out.println("ETA: " + neuralNetwork.ETA);
+        //System.out.println("Max Iteration Number: " + neuralNetwork.GetMaxIterationNumber() + "\n");
+        
         return neuralNetwork.Recognize(entrada);
     }
     
+    public double getError(){
+        return neuralNetwork.GetErrorRate();
+    }
+    
+    public int getIterationNumber(){
+        return (int)neuralNetwork.GetIterationNumber();
+    }
 }
